@@ -110,19 +110,7 @@ export async function updateIndividual(
     contact_name: String(formData.get("contact_name") ?? ""),
     contact_relation: String(formData.get("contact_relation") ?? "") || undefined,
     contact_phone: String(formData.get("contact_phone") ?? ""),
-    guardian_full_name: String(formData.get("guardian_full_name") ?? "") || undefined,
-    guardian_phone: String(formData.get("guardian_phone") ?? "") || undefined,
   });
-  // Update guardian profile info if provided
-  if (parsed.success && (parsed.data.guardian_full_name || parsed.data.guardian_phone)) {
-    await supabase
-      .from("guardians")
-      .update({
-        ...(parsed.data.guardian_full_name ? { full_name: parsed.data.guardian_full_name } : {}),
-        ...(parsed.data.guardian_phone ? { phone: parsed.data.guardian_phone } : {}),
-      })
-      .eq("id", auth.user.id);
-  }
 
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
 
