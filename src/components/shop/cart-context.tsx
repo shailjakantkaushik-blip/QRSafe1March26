@@ -7,7 +7,7 @@ export type CartItem = {
   price: number;
   quantity: number;
   type: string;
-  individual_id: string;
+  individual_id: string; // Always the individual's UUID id
 };
 
 type CartContextType = {

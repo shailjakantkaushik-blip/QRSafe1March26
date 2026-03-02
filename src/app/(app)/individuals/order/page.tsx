@@ -2,12 +2,14 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
+import { useSession } from "@/lib/session-context";
 import { createOrder } from "../order-actions";
 
 
 
 
 export default function OrderPage() {
+  const { user } = useSession();
   const [selected, setSelected] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -28,7 +30,13 @@ export default function OrderPage() {
     setError(null);
     setSuccess(false);
     const formData = new FormData(e.currentTarget);
+    if (!user?.id) {
+      setError("You must be logged in to place an order.");
+      setPending(false);
+      return;
+    }
     const payload = {
+      guardian_id: user.id,
       productType: formData.get("productType"),
       name: formData.get("name"),
       email: formData.get("email"),

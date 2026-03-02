@@ -2,14 +2,12 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
-import { AdminBroadcastMessage } from "@/components/admin/admin-broadcast-message";
-import { QrCodesTable } from "./qr-codes-table";
+import { OrdersTable } from "./orders-table";
 import { AdminTabs } from "@/components/admin/admin-tabs";
-
 
 export const revalidate = 0;
 
-export default async function AdminQrCodesPage() {
+export default async function AdminOrdersPage() {
   // Auth/admin check with supabaseServer
   const supabaseSession = await supabaseServer();
   const { data: auth } = await supabaseSession.auth.getUser();
@@ -40,31 +38,20 @@ export default async function AdminQrCodesPage() {
     );
   }
 
-  // Fetch all data with supabaseAdmin
+  // Fetch all orders with individual and guardian info using supabaseAdmin
   const supabase = supabaseAdmin();
-  const { data: guardians, error: guardianError } = await supabase
-    .from("guardians")
+  const { data: orders, error } = await supabase
+    .from("orders")
     .select(`
       id,
-      full_name,
-      email,
-      phone,
-      individuals:individuals(id, display_name, public_id, created_at)
+      status,
+      created_at,
+      individual_id,
+      guardian_id,
+      individual:individual_id(display_name, public_id),
+      guardian:guardian_id(full_name, email)
     `)
-    .order("full_name", { ascending: true });
-
-  if (guardianError || !guardians) {
-    return (
-      <div className="space-y-4">
-        <div className="text-2xl font-bold">Error</div>
-        <div className="text-muted-foreground">{guardianError?.message || "Failed to load guardians"}</div>
-      </div>
-    );
-  }
-
-  const { data: qrAssets, error } = await supabase
-    .from("qr_assets")
-    .select("individual_id, storage_path");
+    .order("created_at", { ascending: false });
 
   if (error) {
     return (
@@ -77,13 +64,12 @@ export default async function AdminQrCodesPage() {
 
   return (
     <div className="space-y-8">
-      <AdminTabs active="qr" />
-      <AdminBroadcastMessage />
+      <AdminTabs active="orders" />
       <div>
-        <div className="text-2xl font-bold">QR Code Management</div>
-        <div className="text-muted-foreground">Download and manage QR codes for all individuals.</div>
+        <div className="text-2xl font-bold">Order Management</div>
+        <div className="text-muted-foreground">View and manage all orders placed by users.</div>
       </div>
-      <QrCodesTable guardians={guardians} qrAssets={qrAssets || []} />
+      <OrdersTable orders={orders || []} />
     </div>
   );
 }

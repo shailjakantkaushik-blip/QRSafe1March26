@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import AuthCard from "@/components/auth/auth-card";
 

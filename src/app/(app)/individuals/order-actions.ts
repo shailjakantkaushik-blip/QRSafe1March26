@@ -3,8 +3,9 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const orderSchema = z.object({
-  individual_id: z.string().min(1),
-  productType: z.enum(["wristband", "chesttag", "belthook"]),
+  guardian_id: z.string().min(1),
+  // individual_id: z.string().min(1), // Remove if not required
+  productType: z.string().min(1),
   name: z.string().min(1),
   email: z.string().email(),
   address: z.string().min(1),
@@ -14,8 +15,9 @@ const orderSchema = z.object({
 });
 
 export async function createOrder(data: {
-  individual_id: string;
-  product_id: string;
+  guardian_id: string;
+  // individual_id?: string;
+  productType: string;
   name: string;
   email: string;
   address: string;

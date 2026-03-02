@@ -1,11 +1,13 @@
 "use client";
 import { useCart } from "./cart-context";
+import { useGuardianId } from "./use-guardian-id";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
+  const guardianId = useGuardianId();
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,10 +28,12 @@ export default function CheckoutPage() {
     setSuccess(false);
     try {
       // Persist order to DB
+      // Attach guardian_id (UUID) to each item, always use UUIDs for all references
+      const itemsWithGuardian = items.map(item => ({ ...item, guardian_id: guardianId }));
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, shipping: form }),
+        body: JSON.stringify({ items: itemsWithGuardian, shipping: form }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Order failed");

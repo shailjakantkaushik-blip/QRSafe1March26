@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(8, "Minimum 8 characters"),
@@ -19,6 +20,8 @@ const schema = z.object({
 
 export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
   const supabase = supabaseBrowser();
 
@@ -43,7 +46,7 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
       }
 
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -55,21 +58,45 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          setErrorMsg(error.message);
+          return;
+        }
 
-        // Notification logic removed
-        router.push("/login");
-        router.refresh();
+        setMessage("Signup successful! Please check your email for verification or login.");
+        setErrorMsg(null);
+        // Optionally, redirect after a short delay
+        setTimeout(() => {
+          router.push("/login");
+          router.refresh();
+        }, 1500);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        // Notification logic removed
+        // After successful login, upsert guardian info (first login only)
+        // Get user info from session
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          // Call API to upsert guardian info
+          await fetch("/api/ensure-guardian-on-login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name || "",
+              phone: user.user_metadata?.phone || "",
+            }),
+          });
+        }
         // Use full reload to ensure server sees new cookie
         window.location.href = "/dashboard";
       }
     } catch (e: any) {
-      // Notification logic removed
+      setErrorMsg(e?.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -77,6 +104,8 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
 
   return (
     <Card className="p-6">
+      {message && <div className="text-green-600 text-sm mb-2">{message}</div>}
+      {errorMsg && <div className="text-red-600 text-sm mb-2">{errorMsg}</div>}
       <form action={onSubmit} className="space-y-4">
         {mode === "signup" && (
           <>

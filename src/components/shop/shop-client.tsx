@@ -8,6 +8,7 @@ import { useCart } from "@/components/shop/cart-context";
 export default function ShopClient() {
   const [products, setProducts] = useState<any[]>([]);
   const [individuals, setIndividuals] = useState<any[]>([]);
+  // Always use the individual's UUID id for selection
   const [selectedIndividual, setSelectedIndividual] = useState<string>("");
   const { addToCart } = useCart();
 

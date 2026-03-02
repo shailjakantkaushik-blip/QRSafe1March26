@@ -36,15 +36,7 @@ export async function createIndividual(formData: FormData) {
   if (!auth.user.id) return { ok: false, message: "User ID not found" };
 
   // Ensure guardian row exists
-  const { data: guardian } = await supabase.from("guardians").select("id").eq("id", auth.user.id).maybeSingle();
-  if (!guardian) {
-    const { error: gErr } = await supabase.from("guardians").insert({
-      id: auth.user.id,
-      full_name: (auth.user.user_metadata as any)?.full_name ?? null,
-      is_admin: false,
-    });
-    if (gErr) return { ok: false, message: gErr.message };
-  }
+  // Guardian info is now inserted after first login, not here.
 
   const public_id = makePublicId();
   if (!public_id) return { ok: false, message: "Failed to generate public ID" };
@@ -75,24 +67,7 @@ export async function createIndividual(formData: FormData) {
   });
   if (cErr) return { ok: false, message: cErr.message };
 
-  // Generate QR → upload using service role
-  const site = process.env.NEXT_PUBLIC_SITE_URL || "";
-  const publicUrl = `${site.replace(/\/$/, "")}/p/${indiv.public_id}`;
-
-  const dataUrl = await generateQrPngDataUrl(publicUrl);
-  const buf = dataUrlToBuffer(dataUrl);
-  const path = `qr/${indiv.id}.png`;
-
-  const admin = supabaseAdmin();
-  const up = await admin.storage.from("qr").upload(path, buf, { contentType: "image/png", upsert: true });
-  if (up.error) return { ok: false, message: up.error.message };
-
-  const { error: qErr } = await supabase.from("qr_assets").upsert({
-    individual_id: indiv.id,
-    storage_path: path,
-  });
-  if (qErr) return { ok: false, message: qErr.message };
-
+  // QR code is NOT generated here. It will be generated only after a successful product purchase.
   return { ok: true, id: indiv.id };
 }
 
