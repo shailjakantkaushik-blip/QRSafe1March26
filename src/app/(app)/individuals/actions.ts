@@ -29,6 +29,7 @@ export async function createIndividual(formData: FormData) {
   });
 
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
+  const data = parsed.data!;
 
   const supabase = await supabaseServer();
   const { data: auth } = await supabase.auth.getUser();
@@ -115,10 +116,10 @@ export async function updateIndividual(
   const { error: updateErr } = await supabase
     .from("individuals")
     .update({
-      display_name: parsed.data.display_name,
-      date_of_birth: parsed.data.date_of_birth ?? null,
-      allergies: parsed.data.allergies ?? null,
-      medical_notes: parsed.data.medical_notes ?? null,
+      display_name: data.display_name,
+      date_of_birth: data.date_of_birth ?? null,
+      allergies: data.allergies ?? null,
+      medical_notes: data.medical_notes ?? null,
     })
     .eq("id", individualId);
 
@@ -136,9 +137,9 @@ export async function updateIndividual(
     const { error: contactErr } = await supabase
       .from("emergency_contacts")
       .update({
-        name: parsed.data.contact_name,
-        relation: parsed.data.contact_relation ?? null,
-        phone: parsed.data.contact_phone,
+        name: data.contact_name,
+        relation: data.contact_relation ?? null,
+        phone: data.contact_phone,
       })
       .eq("id", existingContact.id);
 
@@ -146,9 +147,9 @@ export async function updateIndividual(
   } else {
     const { error: contactErr } = await supabase.from("emergency_contacts").insert({
       individual_id: individualId,
-      name: parsed.data.contact_name,
-      relation: parsed.data.contact_relation ?? null,
-      phone: parsed.data.contact_phone,
+      name: data.contact_name,
+      relation: data.contact_relation ?? null,
+      phone: data.contact_phone,
       priority: 1,
     });
 
