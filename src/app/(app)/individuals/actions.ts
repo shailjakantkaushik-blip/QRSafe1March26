@@ -44,10 +44,10 @@ export async function createIndividual(formData: FormData) {
     .from("individuals")
     .insert({
       guardian_id: auth.user.id,
-      display_name: parsed.data.display_name,
-      date_of_birth: parsed.data.date_of_birth ?? null,
-      allergies: parsed.data.allergies ?? null,
-      medical_notes: parsed.data.medical_notes ?? null,
+      display_name: data.display_name,
+      date_of_birth: data.date_of_birth ?? null,
+      allergies: data.allergies ?? null,
+      medical_notes: data.medical_notes ?? null,
       public_id,
       is_public: true,
     })
@@ -59,9 +59,9 @@ export async function createIndividual(formData: FormData) {
 
   const { error: cErr } = await supabase.from("emergency_contacts").insert({
     individual_id: indiv.id,
-    name: parsed.data.contact_name,
-    relation: parsed.data.contact_relation ?? null,
-    phone: parsed.data.contact_phone,
+    name: data.contact_name,
+    relation: data.contact_relation ?? null,
+    phone: data.contact_phone,
     priority: 1,
   });
   if (cErr) return { ok: false, message: cErr.message };
