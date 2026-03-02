@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 export default async function DashboardPage() {
   const supabase = await supabaseServer();
   const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user!;
+  const user = auth.user;
 
   const { data: individuals } = await supabase
     .from("individuals")
@@ -21,7 +21,9 @@ export default async function DashboardPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="text-2xl font-bold">Dashboard</div>
-          <div className="text-muted-foreground">Welcome back, {user.email}</div>
+          <div className="text-muted-foreground">
+            {user?.email ? `Welcome back, ${user.email}` : "Welcome!"}
+          </div>
         </div>
         <div className="flex gap-2 items-center">
           <NotificationDropdown />

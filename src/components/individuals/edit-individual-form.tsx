@@ -132,24 +132,6 @@ export function EditIndividualForm({
         </div>
       </div>
 
-      <div className="space-y-2 mt-6">
-        <Label htmlFor="guardian_full_name">Your Full Name (Guardian)</Label>
-        <Input
-          id="guardian_full_name"
-          name="guardian_full_name"
-          placeholder="e.g., Priya Sharma"
-          disabled={isPending}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="guardian_phone">Your Phone (Guardian)</Label>
-        <Input
-          id="guardian_phone"
-          name="guardian_phone"
-          placeholder="e.g., +61 400 000 000"
-          disabled={isPending}
-        />
-      </div>
 
       <div className="flex gap-2 mt-6">
         <Button type="submit" disabled={isPending}>
