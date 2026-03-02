@@ -124,7 +124,7 @@ export async function updateIndividual(
     guardian_phone: String(formData.get("guardian_phone") ?? "") || undefined,
   });
   // Update guardian profile info if provided
-  if (parsed.data.guardian_full_name || parsed.data.guardian_phone) {
+  if (parsed.success && (parsed.data.guardian_full_name || parsed.data.guardian_phone)) {
     await supabase
       .from("guardians")
       .update({
