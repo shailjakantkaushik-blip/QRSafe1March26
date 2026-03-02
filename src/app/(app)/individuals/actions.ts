@@ -15,6 +15,8 @@ const createSchema = z.object({
   contact_name: z.string().min(1),
   contact_relation: z.string().optional(),
   contact_phone: z.string().min(5),
+  guardian_full_name: z.string().optional(),
+  guardian_phone: z.string().optional(),
 });
 
 export async function createIndividual(formData: FormData) {
@@ -26,6 +28,8 @@ export async function createIndividual(formData: FormData) {
     contact_name: String(formData.get("contact_name") ?? ""),
     contact_relation: String(formData.get("contact_relation") ?? "") || undefined,
     contact_phone: String(formData.get("contact_phone") ?? ""),
+    guardian_full_name: String(formData.get("guardian_full_name") ?? "") || undefined,
+    guardian_phone: String(formData.get("guardian_phone") ?? "") || undefined,
   });
 
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -35,8 +39,17 @@ export async function createIndividual(formData: FormData) {
   if (!auth.user) return { ok: false, message: "Not authenticated" };
   if (!auth.user.id) return { ok: false, message: "User ID not found" };
 
-  // Ensure guardian row exists
-  // Guardian info is now inserted after first login, not here.
+
+  // Update guardian profile info if provided
+  if (parsed.data.guardian_full_name || parsed.data.guardian_phone) {
+    await supabase
+      .from("guardians")
+      .update({
+        ...(parsed.data.guardian_full_name ? { full_name: parsed.data.guardian_full_name } : {}),
+        ...(parsed.data.guardian_phone ? { phone: parsed.data.guardian_phone } : {}),
+      })
+      .eq("id", auth.user.id);
+  }
 
   const public_id = makePublicId();
   if (!public_id) return { ok: false, message: "Failed to generate public ID" };
@@ -79,6 +92,8 @@ const updateSchema = z.object({
   contact_name: z.string().min(1),
   contact_relation: z.string().optional(),
   contact_phone: z.string().min(5),
+  guardian_full_name: z.string().optional(),
+  guardian_phone: z.string().optional(),
 });
 
 export async function updateIndividual(
@@ -95,7 +110,19 @@ export async function updateIndividual(
     contact_name: String(formData.get("contact_name") ?? ""),
     contact_relation: String(formData.get("contact_relation") ?? "") || undefined,
     contact_phone: String(formData.get("contact_phone") ?? ""),
+    guardian_full_name: String(formData.get("guardian_full_name") ?? "") || undefined,
+    guardian_phone: String(formData.get("guardian_phone") ?? "") || undefined,
   });
+  // Update guardian profile info if provided
+  if (parsed.data.guardian_full_name || parsed.data.guardian_phone) {
+    await supabase
+      .from("guardians")
+      .update({
+        ...(parsed.data.guardian_full_name ? { full_name: parsed.data.guardian_full_name } : {}),
+        ...(parsed.data.guardian_phone ? { phone: parsed.data.guardian_phone } : {}),
+      })
+      .eq("id", auth.user.id);
+  }
 
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
 

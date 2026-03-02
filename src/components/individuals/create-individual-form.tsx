@@ -58,9 +58,20 @@ export function CreateIndividualForm() {
         <Input name="contact_relation" placeholder="Mother / Father / Guardian" />
       </div>
 
+
       <div className="space-y-2 md:col-span-2">
         <Label>Phone</Label>
         <Input name="contact_phone" placeholder="+61 ..." required />
+      </div>
+
+      <div className="space-y-2 md:col-span-2">
+        <Label>Your Full Name (Guardian)</Label>
+        <Input name="guardian_full_name" placeholder="e.g., Priya Sharma" />
+      </div>
+
+      <div className="space-y-2 md:col-span-2">
+        <Label>Your Phone (Guardian)</Label>
+        <Input name="guardian_phone" placeholder="e.g., +61 400 000 000" />
       </div>
 
       <div className="md:col-span-2">
