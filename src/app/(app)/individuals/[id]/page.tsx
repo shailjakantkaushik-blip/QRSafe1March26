@@ -38,7 +38,7 @@ export default async function IndividualDetailPage({ params }: { params: Promise
     );
   }
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL!;
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "";
   const publicUrl = `${site.replace(/\/$/, "")}/p/${indiv.public_id}`;
 
   // Fetch primary emergency contact

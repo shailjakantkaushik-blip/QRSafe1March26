@@ -76,7 +76,7 @@ export async function createIndividual(formData: FormData) {
   if (cErr) return { ok: false, message: cErr.message };
 
   // Generate QR → upload using service role
-  const site = process.env.NEXT_PUBLIC_SITE_URL!;
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "";
   const publicUrl = `${site.replace(/\/$/, "")}/p/${indiv.public_id}`;
 
   const dataUrl = await generateQrPngDataUrl(publicUrl);
