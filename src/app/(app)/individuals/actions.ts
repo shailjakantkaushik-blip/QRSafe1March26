@@ -41,7 +41,17 @@ export async function createIndividual(formData: FormData) {
 
 
   // Update guardian profile info if provided
-  if (parsed.data.guardian_full_name || parsed.data.guardian_phone) {
+  if (parsed.success && (parsed.data.guardian_full_name || parsed.data.guardian_phone)) {
+    await supabase
+      .from("guardians")
+      .update({
+        ...(parsed.data.guardian_full_name ? { full_name: parsed.data.guardian_full_name } : {}),
+        ...(parsed.data.guardian_phone ? { phone: parsed.data.guardian_phone } : {}),
+      })
+      .eq("id", auth.user.id);
+  }
+  // Update guardian profile info if provided
+  if (parsed.success && (parsed.data.guardian_full_name || parsed.data.guardian_phone)) {
     await supabase
       .from("guardians")
       .update({
