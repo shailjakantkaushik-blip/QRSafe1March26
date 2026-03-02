@@ -63,6 +63,20 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
           return;
         }
 
+        // Immediately upsert guardian info if user is returned
+        if (data?.user) {
+          await fetch("/api/ensure-guardian-on-login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: data.user.id,
+              email: data.user.email,
+              full_name: data.user.user_metadata?.full_name || fullName,
+              phone: data.user.user_metadata?.phone || phone,
+            }),
+          });
+        }
+
         setMessage("Signup successful! Please check your email for verification or login.");
         setErrorMsg(null);
         // Optionally, redirect after a short delay
