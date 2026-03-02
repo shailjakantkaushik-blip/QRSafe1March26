@@ -30,6 +30,7 @@ export async function createIndividual(formData: FormData) {
 
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
   const data = parsed.data!;
+  const data = parsed.data!;
 
   const supabase = await supabaseServer();
   const { data: auth } = await supabase.auth.getUser();
