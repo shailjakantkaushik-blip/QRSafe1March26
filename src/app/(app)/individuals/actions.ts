@@ -77,8 +77,6 @@ const updateSchema = z.object({
   contact_name: z.string().min(1),
   contact_relation: z.string().optional(),
   contact_phone: z.string().min(5),
-  guardian_full_name: z.string().optional(),
-  guardian_phone: z.string().optional(),
 });
 
 export async function updateIndividual(
