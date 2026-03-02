@@ -50,16 +50,6 @@ export async function createIndividual(formData: FormData) {
       })
       .eq("id", auth.user.id);
   }
-  // Update guardian profile info if provided
-  if (parsed.success && (parsed.data.guardian_full_name || parsed.data.guardian_phone)) {
-    await supabase
-      .from("guardians")
-      .update({
-        ...(parsed.data.guardian_full_name ? { full_name: parsed.data.guardian_full_name } : {}),
-        ...(parsed.data.guardian_phone ? { phone: parsed.data.guardian_phone } : {}),
-      })
-      .eq("id", auth.user.id);
-  }
 
   const public_id = makePublicId();
   if (!public_id) return { ok: false, message: "Failed to generate public ID" };
