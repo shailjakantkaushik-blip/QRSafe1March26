@@ -22,6 +22,7 @@ export default async function PublicProfilePage({ params }: { params: { publicId
         </div>
         <div className="mt-4 text-xs text-gray-500">
           Debug: publicId is missing
+        </div>
       </main>
     );
   }
