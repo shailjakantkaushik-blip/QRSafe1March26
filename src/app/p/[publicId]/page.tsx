@@ -65,7 +65,6 @@ export default async function PublicProfilePage({ params }: { params: { publicId
           <br />
           Timestamp: {new Date().toISOString()}
         </div>
-        </div>
       </main>
     );
   }
