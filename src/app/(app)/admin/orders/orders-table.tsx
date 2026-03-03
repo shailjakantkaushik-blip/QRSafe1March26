@@ -28,6 +28,7 @@ export function OrdersTable({ orders }: { orders: any[] }) {
           <thead className="border-b">
             <tr>
               <th className="text-left py-2 px-2">Order ID</th>
+              <th className="text-left py-2 px-2">Product</th>
               <th className="text-left py-2 px-2">Individual Name</th>
               <th className="text-left py-2 px-2">Guardian Name</th>
               <th className="text-left py-2 px-2">Guardian ID</th>
@@ -39,6 +40,7 @@ export function OrdersTable({ orders }: { orders: any[] }) {
             {filteredOrders.map((order: any) => (
               <tr key={order.id} className="border-b hover:bg-muted/50">
                 <td className="py-2 px-2 font-mono text-xs">{order.id.slice(0, 8)}...</td>
+                <td className="py-2 px-2">{order.product?.name || "—"}</td>
                 <td className="py-2 px-2">{order.individual?.display_name || "—"}</td>
                 <td className="py-2 px-2">{order.guardian?.full_name || "—"}</td>
                 <td className="py-2 px-2 font-mono text-xs">{order.guardian_id || "—"}</td>

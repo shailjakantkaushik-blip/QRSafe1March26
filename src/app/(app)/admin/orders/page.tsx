@@ -48,6 +48,7 @@ export default async function AdminOrdersPage() {
       created_at,
       individual_id,
       guardian_id,
+      product:product_id(name, type, description),
       individual:individual_id(display_name, public_id),
       guardian:guardian_id(full_name, email)
     `)
