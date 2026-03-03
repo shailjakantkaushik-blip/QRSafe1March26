@@ -58,6 +58,13 @@ export default async function PublicProfilePage({ params }: { params: { publicId
         </div>
         <div className="mt-4 text-xs text-gray-500">
           Debug: publicId={publicId}, error={indivError?.message}
+          <br />
+          Env: NEXT_PUBLIC_SITE_URL={process.env.NEXT_PUBLIC_SITE_URL}
+          <br />
+          Host: {typeof window !== 'undefined' ? window.location.host : 'server'}
+          <br />
+          Timestamp: {new Date().toISOString()}
+        </div>
         </div>
       </main>
     );
