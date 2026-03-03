@@ -33,6 +33,7 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
       const fullName = String(formData.get("fullName") ?? "").trim();
       const phone = String(formData.get("phone") ?? "").trim();
 
+
       const parsed = schema.safeParse({
         email,
         password,
@@ -41,16 +42,21 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
       });
 
       if (!parsed.success) {
-        // Notification logic removed
+        setErrorMsg(parsed.error.issues[0]?.message || "Invalid input");
         return;
       }
 
       if (mode === "signup") {
+        // Always include phone and email in user_metadata if provided
+        const userMetadata: Record<string, string> = { full_name: fullName };
+        if (phone) userMetadata.phone = phone;
+        if (email) userMetadata.email = email;
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: fullName, phone },
+            data: userMetadata,
             emailRedirectTo:
               typeof window !== "undefined"
                 ? `${window.location.origin}/dashboard`
@@ -70,7 +76,7 @@ export default function AuthCard({ mode }: { mode: "login" | "signup" }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               id: data.user.id,
-              email: data.user.email,
+              email: data.user.email || email,
               full_name: data.user.user_metadata?.full_name || fullName,
               phone: data.user.user_metadata?.phone || phone,
             }),
