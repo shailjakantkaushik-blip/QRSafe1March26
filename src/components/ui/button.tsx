@@ -5,9 +5,10 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
   variant?: "default" | "destructive" | "outline" | "ghost";
   size?: "default" | "lg" | "sm";
+  loading?: boolean;
 };
 
-export function Button({ className, asChild, variant = "default", size = "default", ...props }: ButtonProps) {
+export function Button({ className, asChild, variant = "default", size = "default", loading = false, ...props }: ButtonProps) {
   const variantClass =
     variant === "destructive"
       ? "bg-red-500 text-white hover:bg-red-600"
@@ -35,7 +36,15 @@ export function Button({ className, asChild, variant = "default", size = "defaul
           element.props.className
         ),
         ...props,
-        children: element.props.children,
+        disabled: loading || props.disabled,
+        children: (
+          <>
+            {loading && (
+              <span className="mr-2 animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full inline-block align-middle"></span>
+            )}
+            {element.props.children}
+          </>
+        ),
       });
     }
     // fallback: return child as-is if not valid element
@@ -49,7 +58,13 @@ export function Button({ className, asChild, variant = "default", size = "defaul
         sizeClass,
         className
       )}
+      disabled={loading || props.disabled}
       {...props}
-    />
+    >
+      {loading && (
+        <span className="mr-2 animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full inline-block align-middle"></span>
+      )}
+      {props.children}
+    </button>
   );
 }

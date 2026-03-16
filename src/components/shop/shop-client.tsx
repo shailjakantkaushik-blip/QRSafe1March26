@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useCart } from "@/components/shop/cart-context";
+import { toast } from "react-hot-toast";
 
 export default function ShopClient() {
   const [products, setProducts] = useState<any[]>([]);
@@ -11,6 +12,7 @@ export default function ShopClient() {
   // Always use the individual's UUID id for selection
   const [selectedIndividual, setSelectedIndividual] = useState<string>("");
   const { addToCart } = useCart();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/products")
@@ -49,8 +51,15 @@ export default function ShopClient() {
               <div className="font-bold text-base">${p.price}</div>
               <Button
                 variant="outline"
-                disabled={!selectedIndividual}
-                onClick={() => addToCart({ productId: p.id, name: p.name, price: Number(p.price), type: p.type, individual_id: selectedIndividual })}
+                disabled={!selectedIndividual || loadingId === p.id}
+                loading={loadingId === p.id}
+                onClick={async () => {
+                  setLoadingId(p.id);
+                  await new Promise((res) => setTimeout(res, 500)); // Simulate async
+                  addToCart({ productId: p.id, name: p.name, price: Number(p.price), type: p.type, individual_id: selectedIndividual });
+                  setLoadingId(null);
+                  toast.success(`${p.name} added to cart!`);
+                }}
               >
                 Add to Cart
               </Button>

@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "@/lib/session-context";
 import { NotificationProvider } from "@/components/ui/notification";
 import { CartProvider } from "@/components/shop/cart-context";
+import { ToastProvider } from "@/components/ui/toast-provider";
 
 export const metadata: Metadata = {
   title: "SafeQR — Emergency QR Profiles",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background bg-blue-100 text-foreground">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ToastProvider />
           <NotificationProvider>
             <SessionProvider>
               <CartProvider>

@@ -50,10 +50,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Button>
             </Link>
             <Link href="/shop" className="block">
-              <Button variant="ghost" className="w-full justify-start gap-2">
-                <span className="h-4 w-4 inline-block">🛒</span>
-                Shop
-              </Button>
+              <div className="w-full flex items-center justify-start gap-2">
+                <span className="h-4 w-4 inline-block">
+                  {/* Cart icon with badge */}
+                  {typeof window !== 'undefined' &&
+                    require("@/components/shop/cart-icon-badge").CartIconWithBadge({})}
+                </span>
+                <span className="ml-2">Shop</span>
+              </div>
             </Link>
             <Link href="/guardian-info" className="block">
               <Button variant="ghost" className="w-full justify-start gap-2">
