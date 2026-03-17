@@ -2,6 +2,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 
 export default async function AdminPage() {
+    const supabase = await supabaseServer();
     // Fetch subscription prices
     const { data: prices } = await supabase
       .from("subscription_prices")
@@ -10,9 +11,8 @@ export default async function AdminPage() {
 
     // Helper to get price by type
     const getPrice = (type: string) => prices?.find((p: any) => p.type === type)?.price || "";
-  const supabase = await supabaseServer();
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user!;
+    const { data: auth } = await supabase.auth.getUser();
+    const user = auth.user!;
 
   const { data: guardian } = await supabase
     .from("guardians")
