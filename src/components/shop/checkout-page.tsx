@@ -22,6 +22,19 @@ export default function CheckoutPage() {
   });
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
+  // Subscription prices state
+  const [prices, setPrices] = useState<{ [key: string]: number }>({});
+  // Fetch prices on mount
+  React.useEffect(() => {
+    fetch("/api/subscription-prices")
+      .then(res => res.json())
+      .then(data => {
+        const priceMap: { [key: string]: number } = {};
+        (data.prices || []).forEach((p: any) => { priceMap[p.type] = Number(p.price); });
+        setPrices(priceMap);
+      });
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
@@ -67,15 +80,17 @@ export default function CheckoutPage() {
               <input className="border rounded px-3 py-2" name="zip" placeholder="ZIP / Postal Code" required value={form.zip} onChange={e => setForm(f => ({ ...f, zip: e.target.value }))} />
               <input className="border rounded px-3 py-2" name="country" placeholder="Country" required value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} />
               {/* Subscription Period Selection */}
-              <div>
-                <label htmlFor="subscriptionType" className="block text-sm font-medium mb-1">Subscription Period</label>
+              <div className="border rounded p-3 bg-slate-50">
+                <label htmlFor="subscriptionType" className="block text-base font-semibold mb-2 text-slate-700">Select Subscription Period <span className="text-red-600">*</span></label>
                 <select
                   id="subscriptionType"
                   name="subscriptionType"
                   value={form.subscriptionType}
                   onChange={e => setForm(f => ({ ...f, subscriptionType: e.target.value }))}
-                  className="border rounded px-2 py-1"
+                  className="border rounded px-2 py-2 text-lg"
+                  required
                 >
+                  <option value="" disabled>Select period</option>
                   <option value="monthly">Monthly</option>
                   <option value="quarterly">Quarterly</option>
                   <option value="annual">Annual</option>
@@ -93,7 +108,27 @@ export default function CheckoutPage() {
                 </li>
               ))}
             </ul>
-            <div className="font-bold text-base">Total: ${total.toFixed(2)}</div>
+            {/* Subscription Cost Breakdown */}
+            <div className="mt-4">
+              <div className="text-sm font-medium mb-1">Subscription Cost</div>
+              <div className="flex justify-between text-sm">
+                <span>{form.subscriptionType.charAt(0).toUpperCase() + form.subscriptionType.slice(1)} QR Subscription</span>
+                <span>
+                  {prices[form.subscriptionType] !== undefined ? `$${prices[form.subscriptionType]}` : "—"}
+                </span>
+              </div>
+            </div>
+            {/* Product Cost Breakdown */}
+            <div className="mt-2">
+              <div className="text-sm font-medium mb-1">Product Cost</div>
+              <div className="flex justify-between text-sm">
+                <span>QR Product(s)</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className="font-bold text-base mt-4">Total: {
+              prices[form.subscriptionType] !== undefined ? (prices[form.subscriptionType] + total) : total
+            }$</div>
           </Card>
           <Button className="w-full" type="submit" disabled={pending}>{pending ? "Placing Order..." : "Place Order & Pay"}</Button>
           {error && <div className="text-red-600 text-sm mt-2">{error}</div>}

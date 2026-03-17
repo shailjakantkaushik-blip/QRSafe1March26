@@ -40,6 +40,9 @@ export async function createIndividual(formData: FormData) {
   const public_id = makePublicId();
   if (!public_id) return { ok: false, message: "Failed to generate public ID" };
 
+  // Set default subscription values
+  const now = new Date();
+  const expiry = new Date(now.setMonth(now.getMonth() + 1));
   const { data: indiv, error: iErr } = await supabase
     .from("individuals")
     .insert({
@@ -50,6 +53,9 @@ export async function createIndividual(formData: FormData) {
       medical_notes: data.medical_notes ?? null,
       public_id,
       is_public: true,
+      subscription_active: true,
+      subscription_type: 'monthly',
+      subscription_expiry: expiry.toISOString().split('T')[0],
     })
     .select("id, public_id")
     .single();
