@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function AdminTabs({ active }: { active: "qr" | "orders" }) {
+export function AdminTabs({ active }: { active: "qr" | "orders" | "individuals" }) {
   return (
     <div className="mb-6 flex gap-2 border-b pb-2">
       <Link href="/admin/qr-codes">
