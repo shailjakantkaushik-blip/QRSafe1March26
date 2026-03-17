@@ -83,7 +83,7 @@ export default async function IndividualDetailPage({ params }: { params: Promise
           </div>
           {/* Subscription Status */}
           <div className="mt-2">
-            <Badge variant={indiv.subscription_active ? "success" : "destructive"}>
+            <Badge variant={indiv.subscription_active ? "default" : "outline"}>
               {indiv.subscription_active ? "Subscription Active" : "Subscription Inactive"}
             </Badge>
             {indiv.subscription_active && (
