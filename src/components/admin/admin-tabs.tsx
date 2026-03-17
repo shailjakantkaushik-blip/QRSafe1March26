@@ -10,6 +10,9 @@ export function AdminTabs({ active }: { active: "qr" | "orders" }) {
       <Link href="/admin/orders">
         <Button variant={active === "orders" ? "default" : "outline"} size="sm">Orders</Button>
       </Link>
+      <Link href="/admin/individuals">
+        <Button variant={active === "individuals" ? "default" : "outline"} size="sm">Individuals & Guardians</Button>
+      </Link>
     </div>
   );
 }
