@@ -94,15 +94,9 @@ export default async function IndividualDetailPage({ params }: { params: Promise
             )}
             {/* Show renew button only if inactive or expired */}
             {(!indiv.subscription_active || (indiv.subscription_expiry && new Date(indiv.subscription_expiry) < new Date())) && (
-              <form action="/api/subscription-renew" method="POST" className="mt-2">
-                <input type="hidden" name="individual_id" value={indiv.id} />
-                <select name="subscription_type" defaultValue={indiv.subscription_type || 'monthly'} className="border rounded px-2 py-1 mr-2">
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="annual">Annual</option>
-                </select>
-                <button type="submit" className="bg-green-600 text-white rounded px-3 py-1 font-semibold hover:bg-green-700">Renew Subscription</button>
-              </form>
+              <Link href={`/individuals/renew?individual_id=${indiv.id}&subscription_type=${indiv.subscription_type || 'monthly'}`}>
+                <Button className="bg-green-600 text-white rounded px-3 py-1 font-semibold hover:bg-green-700 mt-2">Renew Subscription</Button>
+              </Link>
             )}
           </div>
         </div>
