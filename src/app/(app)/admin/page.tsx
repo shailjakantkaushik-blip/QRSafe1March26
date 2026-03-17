@@ -67,10 +67,20 @@ export default async function AdminPage() {
         <div className="font-semibold">Recent profiles</div>
         <div className="mt-4 space-y-2 text-sm">
           {(individuals ?? []).map((i) => (
-            <div key={i.id} className="flex items-center justify-between">
+            <form key={i.id} action={`/api/admin/update-individual-subscription?id=${i.id}`} method="POST" className="flex items-center justify-between gap-2">
               <span>{i.display_name}</span>
               <span className="text-muted-foreground">{typeof window !== 'undefined' ? new Date(i.created_at).toLocaleString() : ''}</span>
-            </div>
+              <select name="subscription_active" defaultValue="true" className="border rounded px-2 py-1">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+              <select name="subscription_type" defaultValue="monthly" className="border rounded px-2 py-1">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual</option>
+              </select>
+              <button type="submit" className="bg-blue-600 text-white rounded px-3 py-1 font-semibold hover:bg-blue-700">Update</button>
+            </form>
           ))}
         </div>
       </Card>

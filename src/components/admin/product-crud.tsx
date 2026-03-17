@@ -14,6 +14,50 @@ interface Product {
 }
 
 export default function ProductCrud() {
+    // Subscription prices state
+    const [prices, setPrices] = useState<{ [key: string]: number }>({});
+    useEffect(() => {
+      fetch("/api/subscription-prices")
+        .then(res => res.json())
+        .then(data => {
+          const priceMap: { [key: string]: number } = {};
+          (data.prices || []).forEach((p: any) => { priceMap[p.type] = Number(p.price); });
+          setPrices(priceMap);
+        });
+    }, []);
+
+    const [priceForm, setPriceForm] = useState({
+      monthly: prices.monthly ?? 8,
+      quarterly: prices.quarterly ?? 22,
+      annual: prices.annual ?? 80,
+    });
+    useEffect(() => {
+      setPriceForm({
+        monthly: prices.monthly ?? 8,
+        quarterly: prices.quarterly ?? 22,
+        annual: prices.annual ?? 80,
+      });
+    }, [prices]);
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPriceForm({ ...priceForm, [e.target.name]: Number(e.target.value) });
+    };
+
+    const handlePriceSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      await fetch("/api/admin/update-subscription-prices", {
+        method: "POST",
+        body: new FormData(e.target as HTMLFormElement),
+      });
+      // Refetch prices
+      fetch("/api/subscription-prices")
+        .then(res => res.json())
+        .then(data => {
+          const priceMap: { [key: string]: number } = {};
+          (data.prices || []).forEach((p: any) => { priceMap[p.type] = Number(p.price); });
+          setPrices(priceMap);
+        });
+    };
   const [products, setProducts] = useState<Product[]>([]);
   const [form, setForm] = useState<Partial<Product>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -129,6 +173,24 @@ export default function ProductCrud() {
 
   return (
     <Card className="p-8 shadow-lg border border-gray-200">
+      {/* Subscription Rate Management */}
+      <form onSubmit={handlePriceSubmit} className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div>
+          <label htmlFor="monthly_price" className="block text-xs font-semibold mb-1 text-gray-600">Monthly Price ($)</label>
+          <Input id="monthly_price" name="monthly_price" type="number" step="0.01" min="0" value={priceForm.monthly} onChange={handlePriceChange} required />
+        </div>
+        <div>
+          <label htmlFor="quarterly_price" className="block text-xs font-semibold mb-1 text-gray-600">Quarterly Price ($)</label>
+          <Input id="quarterly_price" name="quarterly_price" type="number" step="0.01" min="0" value={priceForm.quarterly} onChange={handlePriceChange} required />
+        </div>
+        <div>
+          <label htmlFor="annual_price" className="block text-xs font-semibold mb-1 text-gray-600">Annual Price ($)</label>
+          <Input id="annual_price" name="annual_price" type="number" step="0.01" min="0" value={priceForm.annual} onChange={handlePriceChange} required />
+        </div>
+        <div className="md:col-span-3 mt-4">
+          <Button type="submit" className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700">Save Prices</Button>
+        </div>
+      </form>
       <form onSubmit={handleSubmit} className="mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
         <div>
           <label htmlFor="product-name" className="block text-xs font-semibold mb-1 text-gray-600">Name</label>
