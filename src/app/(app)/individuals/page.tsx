@@ -8,9 +8,12 @@ import { getOrderStatsForIndividuals } from "./order-stats";
 
 export default async function IndividualsPage() {
   const supabase = await supabaseServer();
+  const { data: auth } = await supabase.auth.getUser();
+  const guardianId = auth.user?.id;
   const { data: individuals } = await supabase
     .from("individuals")
-    .select("id, display_name, public_id, created_at")
+    .select("id, display_name, public_id, created_at, guardian_id")
+    .eq("guardian_id", guardianId)
     .order("created_at", { ascending: false });
 
   const stats = await getOrderStatsForIndividuals((individuals ?? []).map((i) => i.id));

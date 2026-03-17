@@ -89,9 +89,18 @@ export default async function IndividualDetailPage({ params }: { params: Promise
             {indiv.subscription_active && (
               <div className="text-xs mt-1 text-muted-foreground">
                 Type: {indiv.subscription_type || 'monthly'}<br />
-                Expiry: {indiv.subscription_expiry ? new Date(indiv.subscription_expiry).toLocaleDateString() : '—'}
+                Expiry: {indiv.subscription_expiry ? new Date(indiv.subscription_expiry).toLocaleDateString() : ''}
               </div>
             )}
+            <form action="/api/subscription-renew" method="POST" className="mt-2">
+              <input type="hidden" name="individual_id" value={indiv.id} />
+              <select name="subscription_type" defaultValue={indiv.subscription_type || 'monthly'} className="border rounded px-2 py-1 mr-2">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual</option>
+              </select>
+              <button type="submit" className="bg-green-600 text-white rounded px-3 py-1 font-semibold hover:bg-green-700">Renew Subscription</button>
+            </form>
           </div>
         </div>
         <div className="flex gap-2">
