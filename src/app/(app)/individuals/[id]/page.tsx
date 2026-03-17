@@ -24,7 +24,7 @@ export default async function IndividualDetailPage({ params }: { params: Promise
 
   const { data: indiv, error } = await supabase
     .from("individuals")
-    .select("id, display_name, public_id, allergies, medical_notes, is_public")
+    .select("id, display_name, public_id, allergies, medical_notes, is_public, subscription_active, subscription_type, subscription_expiry")
     .eq("id", id)
     .single();
 
@@ -80,6 +80,18 @@ export default async function IndividualDetailPage({ params }: { params: Promise
           <div className="text-sm text-muted-foreground">
             Public emergency profile:{" "}
             <a className="underline" href={publicUrl} target="_blank" rel="noreferrer">{publicUrl}</a>
+          </div>
+          {/* Subscription Status */}
+          <div className="mt-2">
+            <Badge variant={indiv.subscription_active ? "success" : "destructive"}>
+              {indiv.subscription_active ? "Subscription Active" : "Subscription Inactive"}
+            </Badge>
+            {indiv.subscription_active && (
+              <div className="text-xs mt-1 text-muted-foreground">
+                Type: {indiv.subscription_type || 'monthly'}<br />
+                Expiry: {indiv.subscription_expiry ? new Date(indiv.subscription_expiry).toLocaleDateString() : '—'}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex gap-2">

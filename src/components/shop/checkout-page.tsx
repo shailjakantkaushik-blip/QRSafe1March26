@@ -18,6 +18,7 @@ export default function CheckoutPage() {
     city: "",
     zip: "",
     country: "",
+    subscriptionType: "monthly",
   });
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -28,8 +29,8 @@ export default function CheckoutPage() {
     setSuccess(false);
     try {
       // Persist order to DB
-      // Attach guardian_id (UUID) to each item, always use UUIDs for all references
-      const itemsWithGuardian = items.map(item => ({ ...item, guardian_id: guardianId }));
+      // Attach guardian_id (UUID) and subscriptionType to each item
+      const itemsWithGuardian = items.map(item => ({ ...item, guardian_id: guardianId, subscriptionType: form.subscriptionType }));
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,6 +66,21 @@ export default function CheckoutPage() {
               <input className="border rounded px-3 py-2" name="city" placeholder="City" required value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
               <input className="border rounded px-3 py-2" name="zip" placeholder="ZIP / Postal Code" required value={form.zip} onChange={e => setForm(f => ({ ...f, zip: e.target.value }))} />
               <input className="border rounded px-3 py-2" name="country" placeholder="Country" required value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} />
+              {/* Subscription Period Selection */}
+              <div>
+                <label htmlFor="subscriptionType" className="block text-sm font-medium mb-1">Subscription Period</label>
+                <select
+                  id="subscriptionType"
+                  name="subscriptionType"
+                  value={form.subscriptionType}
+                  onChange={e => setForm(f => ({ ...f, subscriptionType: e.target.value }))}
+                  className="border rounded px-2 py-1"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="annual">Annual</option>
+                </select>
+              </div>
             </div>
           </Card>
           <Card className="p-6">

@@ -15,6 +15,9 @@ interface Individual {
   date_of_birth: string | null;
   allergies: string | null;
   medical_notes: string | null;
+  subscription_active?: boolean;
+  subscription_type?: string;
+  subscription_expiry?: string;
 }
 
 interface EmergencyContact {
@@ -57,6 +60,45 @@ export function EditIndividualForm({
           required
           disabled={isPending}
         />
+      </div>
+
+      {/* Admin Subscription Controls */}
+      <div className="space-y-2 border p-4 rounded">
+        <div className="font-semibold">Subscription Controls (Admin)</div>
+        <div className="flex gap-2 items-center">
+          <Label htmlFor="subscription_active">Active</Label>
+          <Input
+            id="subscription_active"
+            name="subscription_active"
+            type="checkbox"
+            defaultChecked={!!individual.subscription_active}
+            disabled={isPending}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="subscription_type">Type</Label>
+          <select
+            id="subscription_type"
+            name="subscription_type"
+            defaultValue={individual.subscription_type || 'monthly'}
+            disabled={isPending}
+            className="border rounded px-2 py-1"
+          >
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="annual">Annual</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="subscription_expiry">Expiry</Label>
+          <Input
+            id="subscription_expiry"
+            name="subscription_expiry"
+            type="date"
+            defaultValue={individual.subscription_expiry || ''}
+            disabled={isPending}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
