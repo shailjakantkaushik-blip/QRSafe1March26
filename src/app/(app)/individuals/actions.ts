@@ -53,9 +53,9 @@ export async function createIndividual(formData: FormData) {
       medical_notes: data.medical_notes ?? null,
       public_id,
       is_public: true,
-      subscription_active: true,
-      subscription_type: 'monthly',
-      subscription_expiry: expiry.toISOString().split('T')[0],
+      subscription_active: false,
+      subscription_type: null,
+      subscription_expiry: null,
     })
     .select("id, public_id")
     .single();

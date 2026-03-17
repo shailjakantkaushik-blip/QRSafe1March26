@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export function CreateIndividualForm() {
   const [pending, startTransition] = useTransition();
+  const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
 
   return (
@@ -20,12 +21,20 @@ export function CreateIndividualForm() {
       action={(fd) => {
         startTransition(() => {
           createIndividual(fd).then((res) => {
-            if (!res.ok) return toast.error(res.message);
-            toast.success("Individual created + QR generated");
+            if (!res.ok) {
+              setNotification(res.message);
+              toast.error(res.message);
+              return;
+            }
+            setNotification("Profile created successfully.");
+            toast.success("Profile created successfully.");
             router.push(`/individuals/${res.id}`);
             router.refresh();
           });
         });
+            {notification && (
+              <div className="text-green-600 font-semibold mb-2">{notification}</div>
+            )}
       }}
     >
       <div className="space-y-2">
