@@ -24,8 +24,8 @@ export function CreateIndividualForm() {
         startTransition(() => {
           createIndividual(fd).then((res) => {
             if (!res.ok) {
-              setNotification(res.message);
-              toast.error(res.message);
+              setNotification(res.message ?? "An error occurred");
+              toast.error(res.message ?? "An error occurred");
               return;
             }
             setNotification("Profile created successfully.");
