@@ -15,12 +15,15 @@ import { Textarea } from "@/components/ui/textarea";
 export function CreateIndividualForm() {
   const [pending, startTransition] = useTransition();
   const [notification, setNotification] = useState<string | null>(null);
-  const router = useRouter();
+  const [formKey, setFormKey] = useState(0);
 
   return (
     <form
+      key={formKey}
       className="grid gap-4 md:grid-cols-2"
-      action={(fd) => {
+      onSubmit={e => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
         startTransition(() => {
           createIndividual(fd).then((res) => {
             if (!res.ok) {
@@ -30,15 +33,14 @@ export function CreateIndividualForm() {
             }
             setNotification("Profile created successfully.");
             toast.success("Profile created successfully.");
-            router.push(`/individuals/${res.id}`);
-            router.refresh();
+            setFormKey(k => k + 1); // Reset form
           });
         });
-            {notification && (
-              <div className="text-green-600 font-semibold mb-2">{notification}</div>
-            )}
       }}
     >
+      {notification && (
+        <div className="text-green-600 font-semibold mb-2 md:col-span-2">{notification}</div>
+      )}
       <div className="space-y-2">
         <Label>Display name</Label>
         <Input name="display_name" placeholder="e.g., Aarav K." required />
