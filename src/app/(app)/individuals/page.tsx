@@ -1,7 +1,6 @@
-
 import { supabaseServer } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
-import { CreateIndividualForm } from "@/components/individuals/create-individual-form";
+import CreateIndividualForm from "@/components/individuals/create-individual-form";
 import Link from "next/link";
 import { getOrderStatsForIndividuals } from "./order-stats";
 
