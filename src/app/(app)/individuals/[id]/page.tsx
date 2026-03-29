@@ -92,12 +92,13 @@ export default async function IndividualDetailPage({ params }: { params: Promise
                 Expiry: {indiv.subscription_expiry ? new Date(indiv.subscription_expiry).toLocaleDateString() : ''}
               </div>
             )}
-            {/* Show renew button only if inactive or expired */}
-            {(!indiv.subscription_active || (indiv.subscription_expiry && new Date(indiv.subscription_expiry) < new Date())) && (
-              <Link href={`/individuals/renew?individual_id=${indiv.id}&subscription_type=${indiv.subscription_type || 'monthly'}`}>
-                <Button className="bg-green-600 text-white rounded px-3 py-1 font-semibold hover:bg-green-700 mt-2">Renew Subscription</Button>
-              </Link>
-            )}
+            {/* Show renew button only if individual is valid and inactive or expired */}
+            {indiv.id &&
+              (!indiv.subscription_active || (indiv.subscription_expiry && new Date(indiv.subscription_expiry) < new Date())) && (
+                <Link href={`/individuals/renew?individual_id=${indiv.id}&subscription_type=${indiv.subscription_type || 'monthly'}`}>
+                  <Button className="bg-green-600 text-white rounded px-3 py-1 font-semibold hover:bg-green-700 mt-2">Renew Subscription</Button>
+                </Link>
+              )}
           </div>
         </div>
         <div className="flex gap-2">
