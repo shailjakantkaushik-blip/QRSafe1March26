@@ -19,9 +19,16 @@ export default function RenewSubscriptionPage({ searchParams }: { searchParams: 
       setLoading(true);
       setError(null);
       try {
+        console.log("Fetching individual for renew page", individual_id);
         const indivRes = await fetch(`/api/individuals/${individual_id}`);
-        if (!indivRes.ok) throw new Error("Failed to fetch individual details.");
+        if (!indivRes.ok) {
+          const errText = await indivRes.text();
+          throw new Error(`Failed to fetch individual details. Status: ${indivRes.status}. Response: ${errText}`);
+        }
         const indivData = await indivRes.json();
+        if (!indivData.individual) {
+          throw new Error("No individual found for the given ID.");
+        }
         setIndiv(indivData.individual);
         const priceRes = await fetch("/api/subscription-prices");
         if (!priceRes.ok) throw new Error("Failed to fetch subscription prices.");
@@ -30,7 +37,8 @@ export default function RenewSubscriptionPage({ searchParams }: { searchParams: 
         (priceData.prices || []).forEach((p: any) => { priceMap[p.type] = p.price; });
         setPrices(priceMap);
       } catch (err: any) {
-        setError(err.message || "An error occurred while loading data.");
+        console.error("Renew subscription fetch error", err);
+        setError((err && err.message) ? err.message : "An error occurred while loading data.");
       } finally {
         setLoading(false);
       }
