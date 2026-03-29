@@ -12,8 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export function CreateIndividualForm() {
-  const [pending, startTransition] = useTransition();
+  const [_, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(0);
 
@@ -21,21 +21,22 @@ export function CreateIndividualForm() {
     <form
       key={formKey}
       className="grid gap-4 md:grid-cols-2"
-      onSubmit={e => {
+      onSubmit={async e => {
         e.preventDefault();
+        setPending(true);
+        setNotification(null);
         const fd = new FormData(e.currentTarget);
-        startTransition(() => {
-          createIndividual(fd).then((res) => {
-            if (!res.ok) {
-              setNotification(res.message ?? "An error occurred");
-              toast.error(res.message ?? "An error occurred");
-              return;
-            }
-            setNotification("Profile created successfully.");
-            toast.success("Profile created successfully.");
-            setFormKey(k => k + 1); // Reset form
-          });
-        });
+        const res = await createIndividual(fd);
+        if (!res.ok) {
+          setNotification(res.message ?? "An error occurred");
+          toast.error(res.message ?? "An error occurred");
+          setPending(false);
+          return;
+        }
+        setNotification("Profile created successfully.");
+        toast.success("Profile created successfully.");
+        setFormKey(k => k + 1); // Reset form
+        setPending(false);
       }}
     >
       {notification && (

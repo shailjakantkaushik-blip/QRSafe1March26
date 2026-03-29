@@ -12,25 +12,48 @@ export default function RenewSubscriptionPage({ searchParams }: { searchParams: 
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const indivRes = await fetch(`/api/individuals/${individual_id}`);
-      const indivData = await indivRes.json();
-      setIndiv(indivData.individual);
-      const priceRes = await fetch("/api/subscription-prices");
-      const priceData = await priceRes.json();
-      const priceMap: { [key: string]: number } = {};
-      (priceData.prices || []).forEach((p: any) => { priceMap[p.type] = p.price; });
-      setPrices(priceMap);
-      setLoading(false);
+      setError(null);
+      try {
+        const indivRes = await fetch(`/api/individuals/${individual_id}`);
+        if (!indivRes.ok) throw new Error("Failed to fetch individual details.");
+        const indivData = await indivRes.json();
+        setIndiv(indivData.individual);
+        const priceRes = await fetch("/api/subscription-prices");
+        if (!priceRes.ok) throw new Error("Failed to fetch subscription prices.");
+        const priceData = await priceRes.json();
+        const priceMap: { [key: string]: number } = {};
+        (priceData.prices || []).forEach((p: any) => { priceMap[p.type] = p.price; });
+        setPrices(priceMap);
+      } catch (err: any) {
+        setError(err.message || "An error occurred while loading data.");
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, [individual_id]);
 
   if (loading) {
-    return <div className="p-8 text-center text-lg">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+        <div className="text-lg">Loading subscription details...</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
+        <div className="text-2xl font-bold text-red-600">Error</div>
+        <div className="text-muted-foreground">{error}</div>
+        <Link href="/individuals"><Button variant="outline">Back</Button></Link>
+      </div>
+    );
   }
   if (!indiv) {
     return (
@@ -62,17 +85,22 @@ export default function RenewSubscriptionPage({ searchParams }: { searchParams: 
             e.preventDefault();
             setPending(true);
             setNotification(null);
-            const fd = new FormData(e.currentTarget as HTMLFormElement);
-            const res = await fetch("/api/subscription-renew", {
-              method: "POST",
-              body: fd,
-            });
-            const data = await res.json();
-            if (data.success) {
-              setNotification("Subscription renewed successfully.");
-              setPending(false);
-            } else {
-              setNotification(data.error || "Failed to renew subscription.");
+            setError(null);
+            try {
+              const fd = new FormData(e.currentTarget as HTMLFormElement);
+              const res = await fetch("/api/subscription-renew", {
+                method: "POST",
+                body: fd,
+              });
+              const data = await res.json();
+              if (data.success) {
+                setNotification("Subscription renewed successfully.");
+              } else {
+                setError(data.error || "Failed to renew subscription.");
+              }
+            } catch (err: any) {
+              setError(err.message || "Failed to renew subscription.");
+            } finally {
               setPending(false);
             }
           }}
@@ -91,8 +119,11 @@ export default function RenewSubscriptionPage({ searchParams }: { searchParams: 
             <option value="annual">Annual</option>
           </select>
           <div className="text-lg font-bold">Amount: ${price}</div>
-          {/* Payment gateway integration will go here */}
-          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={pending}>
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded p-2 text-sm mb-2">
+            <b>Payment integration coming soon.</b> This is a demo renewal. No payment will be processed.
+          </div>
+          {error && <div className="text-red-600 text-sm font-semibold mb-2">{error}</div>}
+          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={pending} loading={pending}>
             {pending ? "Processing..." : "Pay & Renew"}
           </Button>
         </form>

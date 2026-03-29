@@ -2,12 +2,14 @@
 import React, { useState } from "react";
 import { useCart } from "./cart-context";
 import { useGuardianId } from "./use-guardian-id";
+import { useGuardianSubscription } from "./use-guardian-subscription";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
   const guardianId = useGuardianId();
+  const subscription = useGuardianSubscription();
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
